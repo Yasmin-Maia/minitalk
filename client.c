@@ -6,7 +6,7 @@
 /*   By: yasmin <yasmin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 15:30:30 by yasmin            #+#    #+#             */
-/*   Updated: 2025/05/13 14:39:16 by yasmin           ###   ########.fr       */
+/*   Updated: 2025/05/21 16:44:35 by yasmin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void send_char(pid_t pid, char c)
             kill(pid, SIGUSR1);
         else
             kill(pid, SIGUSR2);
-        usleep(500);
+        usleep(1000);
         bit++;
     }
 }
@@ -49,14 +49,13 @@ int main(int argc, char **argv)
     char    *msg;
     
     if (argc != 3)
-        error_exit("Usage: ./client <PID> <mensagem>\n");
+        error_exit("Use: ./client <PID> <mensagem>\n");
     pid = ft_atoi(argv[1]);
     msg = argv[2];
     signal(SIGUSR1, ack_handler);
     while (*msg)
         send_char(pid, *msg++);
 
-    // Envia '\0' no final como sinal de fim (opcional)
     send_char(pid, '\0');
     pause();
     return 0;
