@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minitalk.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yasmin <yasmin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 15:32:59 by yasmin            #+#    #+#             */
-/*   Updated: 2025/06/19 21:18:00 by yasmin           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:08:01 by ymaia-do         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,25 @@
 # define MINITALK_H
 
 # include "../libft/libft.h"
+# include "libft/ft_printf/ft_printf.h"
 # include <unistd.h>
 # include <signal.h>
 # include <stdlib.h>
 # include <stdio.h>
 
+#define BIT_SLEEP_TIME 100
+#define MSG_RECEIVED "Mensagem recebida!\n"
+
 typedef int pid_t;
 
-// Se quiser, declare uma struct aqui (por enquanto não é obrigatório)
-typedef struct s_message
+typedef struct s_server_data
 {
-    int             bit_count;
+    char    *buffer;
+    int     buf_len;
+    int     bit_count;
     unsigned char   current_char;
-}   t_message;
+}   t_server_data;
 
-// Declarações de funções
-void    send_char(pid_t pid, char c); // do cliente
-char *append_char(char *buffer, size_t *len, char c);
+
 
 #endif

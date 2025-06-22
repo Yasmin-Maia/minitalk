@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   server.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yasmin <yasmin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 14:49:08 by yasmin            #+#    #+#             */
-/*   Updated: 2025/06/19 21:20:56 by yasmin           ###   ########.fr       */
+/*   Updated: 2025/06/22 21:03:02 by ymaia-do         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-#define BIT_SLEEP_TIME 500  // Microssegundos entre envios de bits
-#define MSG_RECEIVED "Mensagem recebida!\n"
+static int g_fullsize = 0;
 
 void error_exit(char *msg)
 {
@@ -21,95 +20,95 @@ void error_exit(char *msg)
     exit(1);
 }
 
-char *append_char(char *buffer, size_t *len, char c)
+char *create_char(void)
 {
     char *new_buf;
-    size_t i;
 
-    new_buf = ft_calloc(*len + 2, sizeof(char)); // +1 para novo char, +1 para '\0'
+    new_buf = ft_calloc((g_fullsize + 1), sizeof(char));
     if (!new_buf)
-        return NULL;
-    i = 0;
-    while (i < *len)
-    {
-        new_buf[i] = buffer[i];
-        i++;
-    }
-    new_buf[i] = c;
-    if (buffer)
-        free(buffer);
-    *len += 1;
+        error_exit("Error: Memory allocation failed");
     return new_buf;
 }
 
-void handler(int signum, siginfo_t *info, void *context)
+void    printall( char **buffer)
 {
-    (void)context;
-    static int bit_count = 0;
+	if(*buffer)
+	{
+		(*buffer)[g_fullsize] = '\0';
+		ft_printf("%s\n", *buffer);
+		free (*buffer);
+		*buffer = NULL;
+	}
+	g_fullsize = 0;
+}
+
+void fullsize(int sig)
+{
+	static int	size = 0;
+	static int	countbit = 0;
+
+	if (sig == SIGUSR1)
+		size = (size << 1) | 1;
+	else
+		size = size << 1;
+	countbit++;
+	if (countbit == 32)
+	{
+		g_fullsize = size;
+		ft_printf("size: %d\n", g_fullsize);
+		countbit = 0;
+		size = 0;
+	}
+	
+}
+
+void handler(int signum)
+{
+    static int countbit = 0;
     static unsigned char current_char = 0;
     static char *buffer = NULL;
-    static size_t buf_len = 0;
+    static int buf_len = 0;
 
     if (signum == SIGUSR1)
-        current_char |= (1 << (7 - bit_count));
-    bit_count++;
+        current_char |= (1 << (7 - countbit));
+    countbit++;
 
-    if (bit_count == 8)
+    if (countbit == 8)
     {
-        if (current_char == '\0')
-        {
-            if (buffer)
-            {
-                write(1, buffer, buf_len);
-                write(1, "\n", 1);
-                free(buffer);
-                buffer = NULL;
-                buf_len = 0;
-            }
-            kill(info->si_pid, SIGUSR1);
-        }
-        else
-        {
-            buffer = append_char(buffer, &buf_len, current_char);
-            if (!buffer)
-                error_exit("Erro de alocação");
-        }
-        bit_count = 0;
+        if (buffer == NULL && g_fullsize > 0)
+            buffer = create_char();
+        if (buffer && buf_len < g_fullsize)
+			buffer[buf_len++] = current_char;
+        countbit = 0;
         current_char = 0;
     }
-}
-
-void confirmation_handler(int signum)
-{
-    if (signum == SIGUSR1) {
-        write(1, "Mensagem entregue com sucesso!\n", 31);
-        exit(0);  // Encerra o cliente após receber confirmação
+    if (buf_len == g_fullsize && g_fullsize > 0)
+    {
+		printall(&buffer);
+        buf_len = 0;
     }
-}
-
-void handle_interrupt(int sig) {
-    (void)sig;
-    write(1, "\nPrograma encerrado.\n", 21);
-    exit(0);
 }
 
 int main(void)
 {
-    struct sigaction sa;
-
-    sa.sa_sigaction = &handler;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-
-    sigaction(SIGUSR1, &sa, NULL);
-    sigaction(SIGUSR2, &sa, NULL);
-    signal(SIGINT, handle_interrupt);
-
     pid_t pid = getpid();
+	
     printf("Servidor rodando. PID: %d\n", pid);
-
+	signal(SIGUSR1, fullsize);
+	signal(SIGUSR2, fullsize);	
     while (1)
-        pause();
-    
-    return 0;
+    {
+		if (g_fullsize == 0)
+		{
+			signal(SIGUSR1, fullsize);
+			signal(SIGUSR2, fullsize);
+		}
+		else
+		{
+			signal (SIGUSR1, handler);
+			signal (SIGUSR2, handler);
+		}
+		pause();
+	}
+	return (0);
 }
