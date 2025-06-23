@@ -6,7 +6,7 @@
 /*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 14:49:08 by yasmin            #+#    #+#             */
-/*   Updated: 2025/06/23 12:24:28 by ymaia-do         ###   ########.fr       */
+/*   Updated: 2025/06/23 18:09:28 by ymaia-do         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ void handler(int signum)
             buffer = create_buf();
         if (buffer && buf_len < g_fullsize)
 			buffer[buf_len++] = current_char;
+		ft_printf("%d de %d\n", buf_len, g_fullsize);
         countbit = 0;
         current_char = 0;
     }

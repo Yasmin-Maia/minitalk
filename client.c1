@@ -6,7 +6,7 @@
 /*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 15:30:30 by yasmin            #+#    #+#             */
-/*   Updated: 2025/06/23 12:26:58 by ymaia-do         ###   ########.fr       */
+/*   Updated: 2025/06/23 18:17:03 by ymaia-do         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,32 +22,30 @@ void send_size(pid_t pid, int size)
             kill(pid, SIGUSR1);
         else
             kill(pid, SIGUSR2);
-        usleep(BIT_SLEEP_TIME);
+        usleep(1000);
         bit--;
     }
 }
 
 void send_str(pid_t pid, char *str, int size)
 {
-    int bit;
-	int i;
+    int bit_index;
+	int bit;
 
-    bit = 0;
-	i = 0;
-    while(bit < size)
+    bit_index = 0;
+    while(bit_index < size)
     {
-		i = 8;
-		while (i > 0)
+		bit = 7;
+		while (bit >= 0)
 		{
-			if (str[bit] & 0b10000000)
+			if ((str[bit_index] >> bit) & 1)
 				kill(pid, SIGUSR1);
 			else
 				kill(pid, SIGUSR2);
-			str[bit] = str[bit] << 1;
-			i--;
-			usleep(BIT_SLEEP_TIME);
+			bit--;
+			usleep(1000);
 		}
-        bit++;
+        bit_index++;
     }
 }
 
