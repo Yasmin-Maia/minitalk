@@ -5,80 +5,82 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/06 15:30:30 by yasmin            #+#    #+#             */
-/*   Updated: 2025/06/22 19:51:28 by ymaia-do         ###   ########.fr       */
+/*   Created: 2025/06/23 12:51:05 by ymaia-do          #+#    #+#             */
+/*   Updated: 2025/06/23 15:44:48 by ymaia-do         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void send_size(pid_t pid, int size)
+void	error_exit(char *msg)
 {
-    int bit;
-    
-    bit = 31;
-    while (bit >= 0) {
-        if (size & (1 << bit))
-            kill(pid, SIGUSR1);
-        else
-            kill(pid, SIGUSR2);
-        usleep(BIT_SLEEP_TIME);
-        bit--;
-    }
+	ft_putendl_fd(msg, 2);
+	exit(1);
 }
 
-void send_str(pid_t pid, char *str, int size)
+void check_pid(pid_t pid)
 {
-    int bit;
+    if (pid <= 0 || kill(pid, 0) == -1)
+        error_exit("Invalid PID");
+}
+
+void	ack_handler(int sig)
+{
+	(void)sig;
+}
+
+void	send_bit(pid_t pid, int bit)
+{
+	int sig;
+
+	if (bit)
+		sig = SIGUSR1;
+	else
+		sig = SIGUSR2;
+	
+	if (kill(pid, sig) == -1)
+		error_exit("Erro ao enviar sinal");
+	pause();
+	usleep(1000);
+}
+
+void	send_number(pid_t pid, unsigned int num, int bits)
+{
 	int i;
 
-    bit = 0;
+	i = bits - 1;
+	while (i >= 0)
+	{
+		send_bit(pid, (num >> i) & 1);
+		i--;
+	}
+}
+
+void	send_message(pid_t pid, char *msg)
+{
+	int i;
+
 	i = 0;
-    while(bit < size)
-    {
-		i = 8;
-		while (i > 0)
-		{
-			if (str[bit] & 0b10000000)
-				kill(pid, SIGUSR1);
-			else
-				kill(pid, SIGUSR2);
-			str[bit] = str[bit] << 1;
-			i--;
-			usleep(BIT_SLEEP_TIME);
-		}
-        bit++;
-    }
+	while (msg[i])
+	{
+		send_number(pid, (unsigned char)msg[i], 8);
+		i++;
+	}
 }
 
-void ack_handler(int sig)
-{
-    if (sig == SIGUSR1)
-    {
-        write(1, "Mensagem recebida!\n", 20);
-        exit(0);
-    }
-}
-
-void    error_exit(char *msg)
-{
-    ft_putendl_fd(msg, 2);
-    exit(1);
-}
-
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	pid_t   pid;
 	char    *msg;
 	int     len;
-	
+
 	if (argc != 3)
-	error_exit("Use: ./client <PID> <mensagem>\n");
+		error_exit("Uso: ./client <PID> <mensagem>");
+	pid = ft_atoi(argv[1]);
 	msg = argv[2];
 	len = ft_strlen(msg);
-	pid = ft_atoi(argv[1]);
-	ft_printf("%d\n", len);
-	send_size(pid, len);
-	send_str(pid, msg, len);
+	signal(SIGUSR1, ack_handler);
+	send_number(pid, len, 32);
+	send_message(pid, msg);
 	return (0);
 }

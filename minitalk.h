@@ -6,7 +6,7 @@
 /*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 15:32:59 by yasmin            #+#    #+#             */
-/*   Updated: 2025/06/22 21:08:01 by ymaia-do         ###   ########.fr       */
+/*   Updated: 2025/06/23 15:53:19 by ymaia-do         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,6 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-#define BIT_SLEEP_TIME 100
-#define MSG_RECEIVED "Mensagem recebida!\n"
-
 typedef int pid_t;
 
 typedef struct s_server_data
@@ -31,8 +28,16 @@ typedef struct s_server_data
     int     buf_len;
     int     bit_count;
     unsigned char   current_char;
+    int     receiving_size;
+    int     size_bits;
+    int     total_size;
 }   t_server_data;
 
-
+void init_server_data(void);
+void handle_signal(int sig, siginfo_t *info, void *context);
+void error_exit(char *msg);
+void ack(pid_t client_pid);
+void receive_size(int sig, siginfo_t *info);
+void receive_msg(int sig, siginfo_t *info);
 
 #endif
