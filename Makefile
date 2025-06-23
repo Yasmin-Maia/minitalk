@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: yasmin <yasmin@student.42.fr>              +#+  +:+       +#+         #
+#    By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/06 16:43:06 by yasmin            #+#    #+#              #
-#    Updated: 2025/05/13 11:29:30 by yasmin           ###   ########.fr        #
+#    Updated: 2025/06/23 16:13:39 by ymaia-do         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,6 +61,7 @@ clean:
 
 fclean: clean
 	@$(MAKE) -C $(LIBFT_DIR) fclean
+	rm -rf libft
 	rm -f $(NAME_SERVER) $(NAME_CLIENT)
 
 re: fclean all
