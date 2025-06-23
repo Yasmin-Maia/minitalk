@@ -3,57 +3,75 @@
 /*                                                        :::      ::::::::   */
 /*   client.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yasmin <yasmin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/23 12:51:05 by ymaia-do          #+#    #+#             */
-/*   Updated: 2025/06/23 19:24:32 by ymaia-do         ###   ########.fr       */
+/*   Created: 2025/06/01 10:47:53 by yasmin            #+#    #+#             */
+/*   Updated: 2025/06/24 00:02:47 by yasmin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void send_char(pid_t pid, char c)
+static void	ack_handler(int sig)
 {
-    int bit;
-
-    bit = 7;
-    while (bit >= 0)
-    {
-        if ((c >> bit) & 1)
-            kill(pid, SIGUSR1);
-        else
-            kill(pid, SIGUSR2);
-        bit--;
-        usleep(200); // tempo um pouco maior para segurança com Valgrind
-    }
+	if (sig == SIGUSR1)
+	{
+		write(1, "Message received!\n", 18);
+		exit(0);
+	}
+	(void)sig;
 }
 
-void send_str(pid_t pid, char *str)
+static void	timeout_handler(int sig)
 {
-    int i = 0;
-    while (str[i])
-    {
-        send_char(pid, str[i]);
-        i++;
-    }
-    send_char(pid, '\0'); // envia byte nulo no final
+	(void)sig;
+	write(2, "Timeout: No response from server\n", 33);
+	exit(1);
 }
 
-void    error_exit(char *msg)
+void	send_char(pid_t pid, unsigned char c)
 {
-    write(2, msg, strlen(msg));
-    exit(1);
+	int	bit;
+
+	bit = 7;
+	while (bit >= 0)
+	{
+		if ((c >> bit) & 1)
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		usleep(5000);
+		bit--;
+	}
 }
 
-int main(int argc, char **argv)
+void	send_string(pid_t pid, char *str)
 {
-    pid_t pid;
+	int	i;
 
-    if (argc != 3)
-        error_exit("Use: ./client <PID> <mensagem>\n");
+	i = 0;
+	while (str[i])
+	{
+		send_char(pid, str[i]);
+		i++;
+	}
+	send_char(pid, '\0');
+}
 
-    pid = atoi(argv[1]);
-    send_str(pid, argv[2]);
+int	main(int argc, char **argv)
+{
+	pid_t	server_pid;
 
-    return (0);
+	if (argc != 3)
+		error_exit("Usage: ./client <server_pid> <message>");
+	server_pid = ft_atoi(argv[1]);
+	if (server_pid <= 0)
+		error_exit("Invalid PID");
+	signal(SIGUSR1, ack_handler);
+	signal(SIGUSR2, ack_handler);
+	signal(SIGALRM, timeout_handler);
+	alarm(30);
+	send_string(server_pid, argv[2]);
+	pause();
+	return (0);
 }
