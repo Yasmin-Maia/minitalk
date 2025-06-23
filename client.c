@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.ccx                                         :+:      :+:    :+:   */
+/*   client.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/23 12:51:05 by ymaia-do          #+#    #+#             */
-/*   Updated: 2025/06/23 18:25:32 by ymaia-do         ###   ########.fr       */
+/*   Updated: 2025/06/23 19:24:32 by ymaia-do         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void send_char(pid_t pid, char c)
         else
             kill(pid, SIGUSR2);
         bit--;
-        usleep(1000); // tempo um pouco maior para segurança com Valgrind
+        usleep(200); // tempo um pouco maior para segurança com Valgrind
     }
 }
 
