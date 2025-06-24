@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: yasmin <yasmin@student.42.fr>              +#+  +:+       +#+         #
+#    By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/06 16:43:06 by yasmin            #+#    #+#              #
-#    Updated: 2025/06/23 23:50:52 by yasmin           ###   ########.fr        #
+#    Updated: 2025/06/24 22:39:27 by ymaia-do         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,8 +30,8 @@ LIBS = $(LIBFT_A)
 
 LIBFT_REPO = git@github.com:Yasmin-Maia/libft.git
 
-SRCS_SERVER = server.c minitalk_utils.c
-SRCS_CLIENT = client.c minitalk_utils.c
+SRCS_SERVER = server.c
+SRCS_CLIENT = client.c
 
 OBJS_SERVER = $(SRCS_SERVER:.c=.o)
 OBJS_CLIENT = $(SRCS_CLIENT:.c=.o)

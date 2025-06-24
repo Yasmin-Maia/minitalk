@@ -6,7 +6,7 @@
 /*   By: ymaia-do <ymaia-do@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 15:32:59 by yasmin            #+#    #+#             */
-/*   Updated: 2025/06/24 17:22:19 by ymaia-do         ###   ########.fr       */
+/*   Updated: 2025/06/24 23:44:06 by ymaia-do         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,8 @@
 
 typedef struct s_msg
 {
-	char	*buffer;
-	size_t 	len;
-	size_t	all_len;
-} t_msg;
-
-void	*ft_realloc(void *ptr, size_t old_size, size_t new_size);
-void	error_exit(char *msg);
+	char			c;
+	struct s_msg	*next;
+}	t_msg;
 
 #endif
